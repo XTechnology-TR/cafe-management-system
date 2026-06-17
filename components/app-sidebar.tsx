@@ -82,11 +82,9 @@ export function AppSidebar({ user }: { user: { name: string; email: string } }) 
               const active = pathname === item.href
               return (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={active}>
-                    <Link href={item.href}>
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </Link>
+                  <SidebarMenuButton render={<Link href={item.href} />} isActive={active}>
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )
@@ -124,25 +122,23 @@ export function AppSidebar({ user }: { user: { name: string; email: string } }) 
       </SidebarContent>
       <SidebarFooter>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                'flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors',
-                'hover:bg-sidebar-accent',
-              )}
-            >
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
-                {initials || 'RP'}
-              </div>
-              <div className="flex min-w-0 flex-col leading-tight">
-                <span className="truncate text-sm font-medium text-sidebar-foreground">
-                  {user.name}
-                </span>
-                <span className="truncate text-xs text-sidebar-foreground/60">
-                  {user.email}
-                </span>
-              </div>
-            </button>
+          <DropdownMenuTrigger
+            className={cn(
+              'flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors',
+              'hover:bg-sidebar-accent',
+            )}
+          >
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
+              {initials || 'RP'}
+            </div>
+            <div className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate text-sm font-medium text-sidebar-foreground">
+                {user.name}
+              </span>
+              <span className="truncate text-xs text-sidebar-foreground/60">
+                {user.email}
+              </span>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Hesabım</DropdownMenuLabel>

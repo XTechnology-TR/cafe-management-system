@@ -176,6 +176,37 @@ export async function updateItemQuantity(itemId: number, orderId: number, quanti
   revalidatePath('/kitchen')
 }
 
+export async function getKitchenOrders() {
+  const userId = await getUserId()
+  const openOrders = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.userId, userId), eq(orders.status, 'acik')))
+    .orderBy(desc(orders.createdAt))
+
+  if (openOrders.length === 0) return [] as OrderWithItems[]
+
+  const items = await db
+    .select()
+    .from(orderItems)
+    .where(
+      and(
+        eq(orderItems.userId, userId),
+        inArray(
+          orderItems.orderId,
+          openOrders.map((o) => o.id),
+        ),
+      ),
+    )
+
+  return openOrders
+    .map((order) => ({
+      order,
+      items: items.filter((i) => i.orderId === order.id),
+    }))
+    .filter((o) => o.items.length > 0) satisfies OrderWithItems[]
+}
+
 export async function setItemStatus(itemId: number, status: string) {
   const userId = await getUserId()
   await db
@@ -274,4 +305,33 @@ export async function getDeliveryOrders() {
     .where(and(eq(orders.userId, userId), inArray(orders.type, ['paket', 'gel-al'])))
     .orderBy(desc(orders.createdAt))
   return list
+}
+
+export async function getDeliveryOrdersWithItems() {
+  const userId = await getUserId()
+  const deliveryOrders = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.userId, userId), inArray(orders.type, ['paket', 'gel-al'])))
+    .orderBy(desc(orders.createdAt))
+
+  if (deliveryOrders.length === 0) return [] as OrderWithItems[]
+
+  const items = await db
+    .select()
+    .from(orderItems)
+    .where(
+      and(
+        eq(orderItems.userId, userId),
+        inArray(
+          orderItems.orderId,
+          deliveryOrders.map((o) => o.id),
+        ),
+      ),
+    )
+
+  return deliveryOrders.map((order) => ({
+    order,
+    items: items.filter((i) => i.orderId === order.id),
+  })) satisfies OrderWithItems[]
 }
